@@ -1,8 +1,8 @@
 module voter(
 input  clk,
-input  [15:0] class1,
-input  [15:0] class2,
-input  [15:0] class3,
+input  [4:0] class1,
+input  [4:0] class2,
+input  [4:0] class3,
 output reg [1:0]  class
 );
 

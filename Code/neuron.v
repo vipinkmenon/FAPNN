@@ -1,31 +1,65 @@
 module neuron(
 input wire   clk,
-input [15:0] x1,
-input [15:0] x2,
-input [15:0] x3,
-input [15:0] x4,
-input [15:0] w1,
-input [15:0] w2,
-input [15:0] w3,
-input [15:0] w4,
+input wire   strWgt,
+input wire   start,
+input [15:0] x,
+input [15:0] w,
 input [15:0] sigma,
-output reg [15:0] y
+output  y
 );
 
-reg [31:0] p1,p2,p3,p4;
-reg [31:0] sum;
+wire [15:0] wgt;
+wire [47:0] mac;
+reg [1:0] wrAddr;
+reg [1:0] rdAddr;
+reg dspClr;
+reg state;
+localparam IDLE = 'd0;
+
+assign y = (mac > {32'd0,sigma}) ? 1'b1 : 1'b0;
+
+xbip_dsp48_macro_0 dsp (
+  .CLK(clk),  // input wire CLK
+  .SCLR(dspClr),
+  .A(x),      // input wire [15 : 0] A
+  .B(wgt),      // input wire [15 : 0] B
+  .P(mac)      // output wire [47 : 0] P
+);
+
+initial
+begin
+    wrAddr = 0;
+end
 
 always @(posedge clk)
 begin
-	p1 <= x1*w1;
-	p2 <= x2*w1;
-	p3 <= x3*w1;
-	p4 <= x4*w1;
-	sum <= p1+p2+p3+p4;
-	if(sum[31:16] > sigma)
-	    y <= sum[31:16];
-	else
-		y <= 0;
+    if(strWgt)
+        wrAddr <= wrAddr+1'b1;
 end
+
+always @(posedge clk)
+begin
+    case(state)
+        IDLE:begin
+            dspClr <= 1'b1;
+            rdAddr <= 3;
+            if(start)
+            begin
+               dspClr <= 1'b0;
+               rdAddr <= rdAddr+1;
+            end
+        end
+    endcase
+end
+
+Ram wgtRam(
+ .clk(clk),
+ .wr_data(w),
+ .rd_data(wgt),
+ .wr_addr(wrAddr),
+ .rd_addr(rdAddr),
+ .wr_en(strWgt),
+ .rd_en()
+);
 
 endmodule
