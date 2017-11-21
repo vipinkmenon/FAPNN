@@ -1,12 +1,6 @@
 \section{Background and Related Works}
 \label{sec_related}
 
-\begin{enumerate}
-\item Brief architecture of FPGAs
-\item Previous hardware implementations
-\end{enumerate}
-
-
 \begin{figure}[t]
 \centering
    \includegraphics[height=0.6\columnwidth]{Figures/pnn.pdf}
@@ -14,8 +8,8 @@
    \label{fig:pnn}
 \end{figure}
 
-Probabilistic Neural Network (PNN) is a feed forward artificial neural networks developed for solving classification problems \cite{specht1990}.
-During network training, PNN stores the statistical parameters of the training data and later uses this information to classify the inputs.
+Probabilistic Neural Networks (PNNs) are feed forward artificial neural networks developed for solving classification problems \cite{specht1990}.
+During network training, PNN stores the statistical parameters of the training data and later uses this information to classify the test inputs.
 PNNs have been successfully used in applications such as human emotion \cite{zhang2016pnn} and speech recognition \cite{wrobel2017}, biometric identification \cite{junjea2015}, intrusion detection in IT infrastructure \cite{raman2017,zhao2017}, medical diagnos etc.~\cite{mangayarkarasi2017,thara2016}.
 
 
@@ -23,7 +17,7 @@ The general architecture of a PNN is as shown in Fig.~\ref{fig:pnn}.
 It has a layered structure consisting of input layer, pattern layer, summation layer, and output layer. 
 The input layer is responsible for receiving the data to be classified. 
 Each data item is represented as a feature vector (p features in the example).
-The pattern layer consists of multiple groups of neurons each group representing one class for classification (two classes in the example).
+The pattern layer consists of multiple groups of neurons, each group representing one class for classification (two classes in the example).
 During training, the weight vector of each pattern neuron $W$ is set to be equal to the features of the corresponding training sample $X$.
 Thus each neuron in the pattern layer represents a training sample.
 Each input layer neuron is connected with every pattern layer neuron with different weights assigned to the connection. 
@@ -41,10 +35,22 @@ Finally, the output layer chooses the class with the highest probability as the 
 
 
 PNNs have the advantages of much faster training process and more accurate results using the minimum Bayesian risk criterion compared with other networks, such as multilayer perceptron networks.
-They are faster since the PNNs weights are not \emph{trained} but rather assigned.
+They are faster since the their weights are not \emph{trained} but rather assigned.
 In software implementations, PNN requires larger memory for storing the model since the features corresponding to every training data has to be stored and one neuron per train data is required to process the input.
 Moreover, as the number of training set increases, the system will need to perform more computation resulting in decrease in speed of classification. 
 
+There have been a few previous implementations of PNNs on FPGA platforms.
+Most of these implementations are targeting specific applications and cannot be ported to other applications.
+In~\cite{Bu2004} researchers describe an FPGA implementation for bioelectric interface. 
+They implement a special PNN called log-linearised Gaussian mixture network, which estimates the posterior probability based on a Gaussian mixture model and a log-linear model.
+The exponential activation function is implemented using look-up-tables.
+A similar implementation of activation function is adopted in~\cite{Figueiredo1998} also, where FPGA based PNNs are used for multi-spectral image classification.
+In ~\cite{Zhou2010} FPGA based PNNs are used for motor cortical decoding in rats.
+Here the exponential activation function is implemented as a tailor series expansion using look-up-tables.
+A large number of resources are utilised for this implementation.
+This work was later improved by~\cite{Zhu2010}, where the activation function is implemented using CORDIC IP cores.
 
-
-\cite{Zhou2010,Figueiredo1998,Ovtcharov2015,Zhu2010,Shima2007,Bu2004,Zhang2015}
+Since the classification accuracy of PNNs is directly proportional to the number of neurons in pattern layer, it is important to limit the resource requirement of individual neurons and to maximise the total number of neurons.
+In the following section we discuss different approximations to control the resource utilisation and its impact on the overall system performance.
+Although these techniques are described taking PNNs as an example, same or similar techniques can be applied to other neural networks also.
+%\cite{,,Ovtcharov2015,,Shima2007,,Zhang2015}

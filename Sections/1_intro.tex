@@ -3,18 +3,18 @@
 
 Recent years have witnessed rapid adoption of neural networks in varied domains such as speech recognition~\cite{Deng2013}, electrical energy management~\cite{Houria2015}, stock market forecasting~\cite{Ticknor2015}, medicine~\cite{Azar2013} etc. 
 Although inherently parallel in nature, almost all these implementations are software-based running on a standard computer.
-As the complexity of the networks and applications involve, software only implementations find it difficult to meet the performance requirements due to the limited scaling of general purpose processor performance.
+As the complexity of the networks and applications evolve, software only implementations find it difficult to meet the performance requirements due to the limited scaling of general purpose processor performance.
 Pure and custom hardware implementations can provide considerable speed-up in this regard due to their parallel execution model. 
 Still the adoption in this regard is limited owing to a number of challenges faced during hardware implementation of neural networks.
 
-The high cost associated with ASIC mask design and the limited commercial demand limits the full custom implementation of these networks.
+The high cost associated with ASIC mask design and the limited commercial demand limit the full custom implementation of these networks.
 One of the promising arenas is the implementation of the network in a cloud infrastructure~\cite{Yuan2014} and providing it as a service to the users.
 Since the user specifications of the network can greatly vary, a complete custom hardware solution is not feasible in this scenario either.
 Field programmable gate arrays (FPGAs) are promising in this scenario due to their flexible implementation capabilities.
 They are capable of providing much higher throughput compared to software counterparts along with reconfigurability.
 
 Another limitation of hardware implementation is the limited design automation support availability.
-For developing an FPGA based network, the designer should be an expert on FPGA architectural details as well as a hardware description language (HDL).
+For developing an FPGA based network, the designer should be an expert on FPGA architectural details as well as on a hardware description language (HDL).
 Recently introduced high-level synthesis languages enable designing at a higher abstraction (such as in C programming language), but their performance is much lower compared to HDL-based designs.
 They are also not capable of extracting full capabilities of low-level FPGA primitives.
 The designer also needs to build the communication infrastructure to send and receive data between the FPGA and a host computer, and the speed of this link is crucial in achieving high performance.

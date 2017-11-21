@@ -1,7 +1,46 @@
 \section{Results}
 \label{sec_results}
 
-\begin{enumerate}
-\item FPGA implementation results--> resources, fmax, power, num neurons
-\item Accuracy
-\end{enumerate}
+In this section we discuss the implementation and classification performance of FAPNN
+
+\subsection{Implementation}
+\input{Tables/resources}
+The proposed architecture was implemented on a Xilinx Artix-7 xc7a200tfbg676-2 FPGA targeting the AC701 Evaluation board.
+Xilinx Vivado 2017.3 design suite was used for the final implementation.
+The resource utilisation for different components of FPANN is listed in Table~\ref{tab:resource}. 
+The total resource utilisation for implementing one class with 25 pattern neurons is about 280 flip flops, 1001 loop up table and 25 DSP slices.
+The number of DSP slices is quite low due to the resource sharing architecture.
+The target FPGA has a total of 740 DSP slices thus supporting upto 740 pattern neurons based on the proposed architecture.
+Using traditional implementation without resource sharing, each neuron would have taken 4 DSP slices for implementing inputs with 4 features thus providing only 185 neurons.
+Also using floating point representation for data would consume 3$\times$ more DSP slices.
+Implementing the exponential function using CORDIC IP also consumes multiple DSP slices.
+Thus the approximate implementation helps in supporting more number of neurons within the resource restrictions of the FPGA.
+
+The neural network portion of the platform is capable of running at a maximum of 350~MHz on the target FPGA.
+But the maximum operating frequency of the overall system is restricted by the speed of the PCIe interface, which is 250 MHz.
+The achieved communication speed between the host and the FPGA is 1.6GB/s, which is about 80\% of the theoretical maximum throughput.
+Thus the overall system performance is superior to pure software implementation with limited error introduced due to approximations.
+\subsection{Classification Performance}
+
+\input{Tables/perfComp}
+
+The classification accuracy of FPANN was verified using the IRIS data set~\cite{iris}.
+The data set contains 3 classes of 50 instances each, where each class refers to a type of iris plant. 
+One class is linearly separable from the other 2 but the latter are not linearly separable from each other.
+Each data has 4 features such as sepal length, sepal width, petal length, and petal width. 
+The data set is divided into two with 25 instances from each class used for training and the other 25 for testing.
+For performance evaluation, a conventional PNN and an approximate PNN using threshold logic are implemented in Matlab.
+Later the same data is fed into FPANN using the same threshold value used in Matlab implementation.
+The accuracy of the different methods is depicted in Table~\ref{tab:perf}.
+
+The traditional implementation gives the highest accuracy of 96\%.
+The approximate implementation in software gave an accuracy of 94.67\% when tested with a threshold value of 0.999.
+This threshold value was obtained based on the cross validation of the training data.
+But when the threshold value is set to 0.997 through trial and error, the classification accuracy was above 98\%.
+FPANN gave a classification accuracy of 92.4\% using the threshold value of 0.999.
+Using 16-bit fixed point representation, this value is approximately 0.99899.
+Due to this minor inaccuracies (in weights, training data and threshold), the accuracy of FPANN is about 1\% less than the software counterpart.
+
+On the hardware platform, the total time for classifying 75 input samples is about 4.8us.
+The throughput is limited by the clock frequency of PCIe interface and the latency in the DSP slices.
+Still it is more than 1200$\times$ faster than the same implementation on Matlab running on a host computing with Intel i7 processor and 4GB RAM. 

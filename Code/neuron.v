@@ -2,8 +2,8 @@ module neuron(
 input wire   clk,
 input wire   strWgt,
 input wire   start,
-input [15:0] x,
-input [15:0] w,
+input wire   train,
+input [15:0] data,
 input [15:0] sigma,
 output  y
 );
@@ -21,7 +21,7 @@ assign y = (mac > {32'd0,sigma}) ? 1'b1 : 1'b0;
 xbip_dsp48_macro_0 dsp (
   .CLK(clk),  // input wire CLK
   .SCLR(dspClr),
-  .A(x),      // input wire [15 : 0] A
+  .A(data),      // input wire [15 : 0] A
   .B(wgt),      // input wire [15 : 0] B
   .P(mac)      // output wire [47 : 0] P
 );
@@ -29,6 +29,7 @@ xbip_dsp48_macro_0 dsp (
 initial
 begin
     wrAddr = 0;
+    state = IDLE;
 end
 
 always @(posedge clk)
@@ -54,7 +55,7 @@ end
 
 Ram wgtRam(
  .clk(clk),
- .wr_data(w),
+ .wr_data(data),
  .rd_data(wgt),
  .wr_addr(wrAddr),
  .rd_addr(rdAddr),

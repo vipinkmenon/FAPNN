@@ -21,7 +21,9 @@ The FPGA board also has an on-board DDR3 memory supporting up to 1GB for tempora
 We use our previously developed open-source FPGA switch IP core for interfacing the PCIe core, DRAM memory controller and the neural network accelerator~\cite{blanked}.
 Through software control from the host, the training data, weights and test data can be either stored in the DRAM or directly injected to the neural network.
 For the PNN implementation, the data is directly injected to the neural network since the modified architecture is capable of storing the entire training data in the FPGA itself.
+Intermediate storage may be necessary for systems where sufficient FPGA resources are not available to store the complete input data or the training weights.
 The interfacing logic (PCIe and DRAM) and the switch logic remains the same irrespective of the neural network implemented on the FPGA platform.
+This makes the platform highly portable for different network configuration implementations.
 
 The control logic block shown in Fig.~\ref{fig:sysArch} is specific to the target neural network architecture.
 It is responsible for generating the global control signals, which controls the storage of weights (training data in case of PNN) inside the appropriate neurons.
@@ -33,13 +35,13 @@ The number of classes in the pattern layer and the number of neurons in each cla
 The automation tool automatically generates the HDL code corresponding to the chosen parameters.
 
 \subsection{FAPNN}
-FAPNN is available in the form of a library targeting the proposed system architecture.
+FPGA based Approximate Probability Neural Network (FAPNN) is available in the form of a library targeting the proposed system architecture.
 Its components are highly customisable and scalable at design time based on user requirements.
 Following similar design principles, library components can be developed for implementing other neural network models.
 Irrespective of the model, the interface between the neural network and the remainder of the system remains unaltered.
 In the subsequent section we detail the individual building blocks of FAPNN.
 
-\subsubsection{\bf Neuron}
+\subsubsection{\bf Pattern Neuron}
 \begin{figure}[t]
 \centering
    \includegraphics[height=0.6\columnwidth]{Figures/neuron.pdf}
@@ -54,11 +56,12 @@ In the proposed architecture, each neuron implements a single DSP slice irrespec
 The same slice is used multiple times under the control of a scheduler logic to multiply with different weights ($w_{i}$) with corresponding feature ($x_{i}$).
 The internal accumulator of the DSP slice accumulates the result of multiplication, emulating the dot product.
 This makes the design highly scalable enabling concurrent implementation large number of neurons in the pattern layer, supporting large number of training samples.
-The drawback is this resource sharing incurs a clock latency equal to the number of features for each input sample.
+The drawback is, this resource sharing incurs a clock latency equal to the number of features for each input sample.
 This is mitigated by the high clock frequency at which the overall system is operating.
 
 The neuron internally implements a memory block called \emph{Weight RAM} for storing the multiplication weights (training data).
 Each location in the memory is 16-bit wide and the depth of the memory can be configured at design time as the size of the feature vector.
+The memory will be physically implemented using look-up-tables or FPGA Block memory elements depending on its size.
 During training, the weights are stored in the appropriate memory location by the scheduler.
 It uses the control signals from the Control logic to decide whether the input data should be considered as training data to store in the memory or as test data.
 During testing, the scheduler sequentially reads data from the Weight RAM and applies it to the DSP slice input for multiplying with the input data.
@@ -96,7 +99,7 @@ The exact form of the activation function is not critical to the usefulness of t
 Since the data is normalised, the value of the dot product is always between 0 and 1.
 The common criteria is that the activation function takes its maximum value at $X.W_i$ = 1 or maximum similarity between the input pattern X and the pattern stored in the pattern unit; the activation function decreases as the pattern becomes less similar.
 Mathematically for a two feature input data, the probability density function changes its shape from Gaussian to square prism when the activation function is approximated as shown in Fig.~\ref{fig:pdf}.
-The value of $\theta$ is decided during training through cross validation sub-training data.
+The value of $\theta$ is decided during training through cross validation of training data.
 
 \subsubsection{\bf Averaging Neuron}
 For every class, an averaging neuron is instantiated for summing up and finding the average of the pattern neurons.
