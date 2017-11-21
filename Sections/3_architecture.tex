@@ -32,11 +32,31 @@ The automation tool automatically generates the HDL code corresponding to the ch
 \subsection{Neuron}
 \begin{figure}[t]
 \centering
-   \includegraphics[height=0.5\columnwidth]{Figures/neuron.pdf}
+   \includegraphics[height=0.6\columnwidth]{Figures/neuron.pdf}
    \caption{Architecture of a single Neuron using Xilinx DSP48 slice}
    \label{fig:neuron}
 \end{figure}
 The architecture of a single neuron used in the PNN pattern layer is depicted in Fig.~\ref{fig:neuron}.
+Internally each neuron instantites a Xilinx DSP48E1 slice.
+DSP48E1 is a built-in macro available in Xilinx 7-Series FPGAs, which are highly efficient in implementing signal processing taks.
+It has a 25$\times$25 multiplier and a 48-bit accumulator.
+In the proposed architecture, each neuron implements a single DSP slice irrespective of the size of the feature vecor (X).
+The same slice is used multiple times under the control of a scheduler logic to multiply with different weights ($w_{i}$) with corresponding feature ($x_{i}$).
+The internal accumulator accumulates the result of multiplication.
+This makes the design highly scalable enabling concurrent implementation large number of neurons in the pattern layer, supporting large number of training samples.
+The drawback is this resource sharing incurs a clock latency equal to the number of features for each input sample.
+This is mitigated by the high clock frequench at which the overall system is operating.
+
+The neuron internally implements a memory block for storing the multiplication weights (training data).
+Each location in the memory is 16-bit wide and the depth of the memory can be configured at design time as the size of the feature vector.
+During training, the weights are stored in the appropriate memory location by the scheduler.
+It uses the control signals from the Control logic to decide whether the input data should be considered as training data to store in the memory or as test data.
+The input data width is 16-bit wide and in the PNN implementation data is represented using fixed point notation.
+Although the accuracy may be affected by fixed point representation compared to floating point representation, the hardware cost is much reduced and the clock frequency is improved.
+
+Finally the comparator ($f$ block in the figure) compares the output from the DSP slice with a pre-defined threshold after all multiply-accumulate operation.
+Its one bit output is high if the output value is greater than the threshold and 0 otherwise.
+
 
 
 \begin{enumerate}
