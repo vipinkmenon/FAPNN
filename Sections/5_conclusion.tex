@@ -1,6 +1,15 @@
 \section{Conclusion}
 \label{sec_conclusion}
 
-\begin{enumerate}
-\item discussion of PR
-\end{enumerate}
+In this paper we discussed the design and implementation of an FPGA-based approximate probability neural network.
+The proposed system architecture is highly scalable and is capable of implementing other neural networks also.
+The hardware approximations used enabled implementing larger networks within the resource constraints of an FPGA while keeping the classification error within tolerable limit.
+These approximations also improved the maximum clock frequency of the overall design.
+The automation scripts enable quickly building a hardware based neural network without the HDL design expertise.
+The proposed system is available to researchers as an open-source platform~\cite{blanked}.
+
+In the future we will be adding more library support to the platform such as multi-layer perceptrons, approximate sigmoid neurons based ANNs, long short term memory networks (LSTMs), hierarchical temporal memory networks (HTMs) etc.
+Another research direction is exploiting FPGA partial reconfiguration (PR) to further improve the resource availability.
+Using PR it will be possible to dynamically load and unload circuits the FPGA while preserving the communication link to the host machine.
+Thus for multi-layer neural networks, it will be possible to time multiplex FPGA resources to implement different layers, thus increasing the effective logic capacity of each layer.
+
